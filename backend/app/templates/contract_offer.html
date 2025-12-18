@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>{% include "_base.css" %}</style>
+</head>
+<body>
+  <div class="header">
+    <div class="left">
+      <div class="brand">БАНК (демо)</div>
+      <div class="doc">Договор‑оферта на выпуск и обслуживание платежной карты</div>
+    </div>
+    <div class="right small">
+      Сформировано: {{ generated_at.strftime("%d.%m.%Y %H:%M") if generated_at else "" }}<br/>
+      Заявка: <span class="badge">{{ app.application_no }}</span>
+    </div>
+  </div>
+
+  <h1>Договор‑оферта</h1>
+
+  <div class="box">
+    <div class="grid">
+      <div class="row"><div class="cell label">Клиент</div><div class="cell value">{{ client.full_name or "-" }}</div></div>
+      <div class="row"><div class="cell label">Документ</div><div class="cell value">{{ client.doc_type or "-" }} {{ client.doc_number or "-" }}</div></div>
+      <div class="row"><div class="cell label">Адрес</div><div class="cell value">{{ client.fact_address or client.reg_address or "-" }}</div></div>
+      <div class="row"><div class="cell label">Контакты</div><div class="cell value">{{ client.phone or "-" }} / {{ client.email or "-" }}</div></div>
+    </div>
+  </div>
+
+  <h2>1. Предмет оферты</h2>
+  <p>
+    Банк предлагает Клиенту выпуск и обслуживание платежной карты на условиях выбранного продукта и тарифного плана.
+    Акцептом оферты является подписание заявления на выпуск карты и/или совершение действий, подтверждающих согласие с условиями.
+  </p>
+
+  <h2>2. Параметры продукта</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Продукт</div><div class="cell value">{{ product.name }} ({{ product.payment_system }} / {{ product.level }})</div></div>
+    <div class="row"><div class="cell label">Валюта / срок</div><div class="cell value">{{ product.currency }} / {{ product.term_months }} мес.</div></div>
+    <div class="row"><div class="cell label">Имя на карте</div><div class="cell value">{{ app.embossing_name or "-" }}</div></div>
+  </div>
+
+  <h2>3. Тариф и стоимость</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Тариф</div><div class="cell value">{{ tariff.name }}</div></div>
+    <div class="row"><div class="cell label">Плата за выпуск</div><div class="cell value">{{ "%.2f"|format(tariff.issue_fee or 0) }} ₽</div></div>
+    <div class="row"><div class="cell label">Ежемесячное обслуживание</div><div class="cell value">{{ "%.2f"|format(tariff.monthly_fee or 0) }} ₽ / мес.</div></div>
+    <div class="row"><div class="cell label">Условия бесплатности</div><div class="cell value">{{ tariff.free_condition_text or "-" }}</div></div>
+  </div>
+
+  <div class="box small">
+    {% set lim = tariff.limits_json or {} %}
+    {% set req = app.limits_requested_json or {} %}
+    {% set labels = {"cash_withdrawal_day":"Снятие наличных (в день)", "purchases_month":"Покупки (в месяц)", "atm_day":"Снятие наличных (в день)"} %}
+    <strong>Лимиты по тарифу:</strong>
+    {% if lim %}
+      {% for k, v in lim.items() %}
+        {{ labels.get(k, k) }}: {{ v }}{% if not loop.last %}; {% endif %}
+      {% endfor %}
+    {% else %}-{% endif %}
+    <br/>
+    <strong>Запрошенные лимиты в заявке:</strong>
+    {% if req %}
+      {% for k, v in req.items() %}
+        {{ labels.get(k, k) }}: {{ v }}{% if not loop.last %}; {% endif %}
+      {% endfor %}
+    {% else %}-{% endif %}
+  </div>
+
+  <h2>4. Выдача и доставка</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Канал</div><div class="cell value">{{ channel.name }}</div></div>
+    <div class="row"><div class="cell label">Офис</div><div class="cell value">{{ branch.city }}, {{ branch.name }}<br/><span class="small">{{ branch.address }}{% if branch.phone %} • {{ branch.phone }}{% endif %}</span></div></div>
+    <div class="row"><div class="cell label">Способ доставки</div><div class="cell value">{{ delivery.name }}</div></div>
+    <div class="row"><div class="cell label">Адрес доставки</div><div class="cell value">{{ app.delivery_address or "-" }}</div></div>
+    <div class="row"><div class="cell label">Плановая дата выпуска</div><div class="cell value">{{ app.planned_issue_date.strftime("%d.%m.%Y") if app.planned_issue_date else "-" }}</div></div>
+  </div>
+
+  <h2>5. Права и обязанности сторон</h2>
+  <ul>
+    <li>Клиент предоставляет достоверные сведения и документы, соблюдает правила использования карты и меры безопасности.</li>
+    <li>Банк осуществляет выпуск карты и обеспечивает выдачу/доставку в соответствии с выбранным способом.</li>
+    <li>Стороны вправе обмениваться уведомлениями по указанным контактам Клиента.</li>
+  </ul>
+
+  <h2>6. Разрешение споров</h2>
+  <p>Споры решаются в досудебном порядке. При недостижении соглашения — в судебном порядке.</p>
+
+  <h2>7. Реквизиты</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Банк</div><div class="cell value">БАНК (демо), адрес: {{ branch.city }}, {{ branch.address }}</div></div>
+    <div class="row"><div class="cell label">Клиент</div><div class="cell value">{{ client.full_name or "-" }}</div></div>
+  </div>
+
+  <div class="sign">
+    <div class="scol">
+      <div>Подпись клиента</div>
+      <div class="line"></div>
+      <div class="name"><span class="hint">ФИО:</span> <strong>{{ client.full_name or "-" }}</strong></div>
+    </div>
+    <div class="scol">
+      <div>Подпись банка</div>
+      <div class="line"></div>
+      <div class="name">
+        <span class="hint">ФИО:</span> <strong>{{ staff_name or "-" }}</strong>
+        {% if staff_position %}<br/><span class="hint">Должность:</span> {{ staff_position }}{% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

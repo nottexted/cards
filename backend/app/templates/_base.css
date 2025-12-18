@@ -1,0 +1,27 @@
+@page { size: A4; margin: 18mm 16mm; }
+* { box-sizing: border-box; }
+body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 11pt; color: #111; }
+h1 { font-size: 15pt; margin: 0 0 8mm 0; }
+h2 { font-size: 12pt; margin: 6mm 0 2mm 0; }
+.small { font-size: 9pt; color: #555; }
+.hr { border-top: 1px solid #ddd; margin: 6mm 0; }
+.header { display: table; width: 100%; margin-bottom: 6mm; }
+.header .left, .header .right { display: table-cell; vertical-align: top; }
+.header .right { text-align: right; }
+.header .brand { font-weight: 900; letter-spacing: -0.2px; }
+.header .doc { font-size: 9pt; color: #6b7280; margin-top: 1mm; }
+.grid { display: table; width: 100%; border-collapse: collapse; }
+.row { display: table-row; }
+.cell { display: table-cell; padding: 2mm 2mm; vertical-align: top; }
+.label { color: #555; width: 35%; }
+.value { width: 65%; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; background: #f2f4f7; font-size: 9pt; }
+.box { border: 1px solid #e7eaf3; border-radius: 8px; padding: 3.5mm 3.5mm; background: #fbfbfe; }
+.muted { color: #6b7280; }
+.footer { margin-top: 10mm; }
+.sign { margin-top: 10mm; display: table; width: 100%; }
+.sign .scol { display: table-cell; width: 50%; }
+.sign .line { margin-top: 12mm; border-top: 1px solid #111; width: 86%; }
+.sign .name { margin-top: 2mm; font-size: 9pt; color: #555; width: 86%; }
+.sign .name strong { color: #111; }
+.sign .hint { font-size: 8.5pt; color: #6b7280; }

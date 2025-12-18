@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>{% include "_base.css" %}</style>
+</head>
+<body>
+  <div class="header">
+    <div class="left">
+      <div class="brand">БАНК (демо)</div>
+      <div class="doc">Заявление на выпуск платежной карты (внутренний документ)</div>
+    </div>
+    <div class="right small">
+      Сформировано: {{ generated_at.strftime("%d.%m.%Y %H:%M") if generated_at else "" }}<br/>
+      Основание: заявка <span class="badge">{{ app.application_no }}</span>
+    </div>
+  </div>
+
+  <h1>Заявление на выпуск платежной карты</h1>
+
+  <div class="box">
+    <div class="grid">
+      <div class="row">
+        <div class="cell label">Номер заявки</div>
+        <div class="cell value"><span class="badge">{{ app.application_no }}</span></div>
+      </div>
+      <div class="row">
+        <div class="cell label">Дата подачи</div>
+        <div class="cell value">{{ app.requested_at.strftime("%d.%m.%Y %H:%M") if app.requested_at else "-" }}</div>
+      </div>
+      <div class="row">
+        <div class="cell label">Приоритет / зарплатный проект</div>
+        <div class="cell value">{{ app.priority or "-" }} / {{ "Да" if app.is_salary_project else "Нет" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2>Сведения о клиенте</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">ФИО</div><div class="cell value">{{ client.full_name or "-" }}</div></div>
+    <div class="row"><div class="cell label">Дата рождения</div><div class="cell value">{{ client.birth_date.strftime("%d.%m.%Y") if client.birth_date else "-" }}</div></div>
+    <div class="row"><div class="cell label">Телефон / Email</div><div class="cell value">{{ client.phone or "-" }} / {{ client.email or "-" }}</div></div>
+    <div class="row"><div class="cell label">Документ</div><div class="cell value">{{ client.doc_type or "-" }} {{ client.doc_number or "-" }}</div></div>
+    <div class="row"><div class="cell label">Дата выдачи / кем выдан</div><div class="cell value">{{ client.doc_issue_date.strftime("%d.%m.%Y") if client.doc_issue_date else "-" }} / {{ client.doc_issuer or "-" }}</div></div>
+    <div class="row"><div class="cell label">Адрес регистрации</div><div class="cell value">{{ client.reg_address or "-" }}</div></div>
+    <div class="row"><div class="cell label">Адрес проживания</div><div class="cell value">{{ client.fact_address or "-" }}</div></div>
+    <div class="row"><div class="cell label">Сегмент / риск / KYC</div><div class="cell value">{{ client.segment or "-" }} / {{ client.risk_level or "-" }} / {{ client.kyc_status or "-" }}</div></div>
+  </div>
+
+  <h2>Параметры продукта</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Продукт</div><div class="cell value">{{ product.name }} ({{ product.payment_system }} / {{ product.level }})</div></div>
+    <div class="row"><div class="cell label">Валюта / Срок</div><div class="cell value">{{ product.currency }} / {{ product.term_months }} мес.</div></div>
+    <div class="row"><div class="cell label">Тариф</div><div class="cell value">{{ tariff.name }}</div></div>
+    <div class="row"><div class="cell label">Имя на карте</div><div class="cell value">{{ app.embossing_name or "-" }}</div></div>
+    <div class="row"><div class="cell label">Запрошенные лимиты</div><div class="cell value">
+      {% set req = app.limits_requested_json or {} %}
+      {% if req %}
+        {% set labels = {"atm_day":"Снятие наличных (в день)", "purchases_month":"Покупки (в месяц)"} %}
+        {% for k, v in req.items() %}
+          {{ labels.get(k, k) }}: {{ v }}{% if not loop.last %}; {% endif %}
+        {% endfor %}
+      {% else %}-{% endif %}
+    </div></div>
+  </div>
+
+  <h2>Выдача и доставка</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Канал</div><div class="cell value">{{ channel.name }}</div></div>
+    <div class="row"><div class="cell label">Офис</div><div class="cell value">{{ branch.city }}, {{ branch.name }}<br/><span class="small">{{ branch.address }}{% if branch.phone %} • {{ branch.phone }}{% endif %}</span></div></div>
+    <div class="row"><div class="cell label">Способ доставки</div><div class="cell value">{{ delivery.name }}</div></div>
+    <div class="row"><div class="cell label">Адрес доставки</div><div class="cell value">{{ app.delivery_address or "-" }}</div></div>
+    <div class="row"><div class="cell label">Желаемая дата доставки</div><div class="cell value">{{ app.requested_delivery_date.strftime("%d.%m.%Y") if app.requested_delivery_date else "-" }}</div></div>
+    <div class="row"><div class="cell label">Комментарий по доставке</div><div class="cell value">{{ app.delivery_comment or "-" }}</div></div>
+  </div>
+
+  <h2>Отметки банка</h2>
+  <div class="grid">
+    <div class="row"><div class="cell label">Плановая дата выпуска</div><div class="cell value">{{ app.planned_issue_date.strftime("%d.%m.%Y") if app.planned_issue_date else "-" }}</div></div>
+    <div class="row"><div class="cell label">Комментарий к заявке</div><div class="cell value">{{ app.comment or "-" }}</div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="box">
+    <div class="small">
+      Подтверждаю достоверность предоставленных данных и даю согласие на обработку персональных данных.
+    </div>
+  </div>
+
+  <div class="sign">
+    <div class="scol">
+      <div>Подпись клиента</div>
+      <div class="line"></div>
+      <div class="name"><span class="hint">ФИО:</span> <strong>{{ client.full_name or "-" }}</strong></div>
+    </div>
+    <div class="scol">
+      <div>Сотрудник банка</div>
+      <div class="line"></div>
+      <div class="name">
+        <span class="hint">ФИО:</span> <strong>{{ staff_name or "-" }}</strong>
+        {% if staff_position %}<br/><span class="hint">Должность:</span> {{ staff_position }}{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="footer small">Сформировано автоматически сервисом эмиссии дебетовых карт.</div>
+</body>
+</html>
